@@ -1,0 +1,11 @@
+{
+ "name": "mapping_empty_process",
+ "mode": "single",
+ "agent": "mapping_agent",
+ "input": {
+   "process_map": []
+ },
+ "expected": {
+   "png_path": "NOT_EMPTY"
+ }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "final_output_flowchart_validity",
+  "mode": "single",
+  "agent": "final_output_agent",
+  "input": {
+    "finalised_output": {
+      "process_map": [
+        {"step_number": 1, "step_name": "Start", "step_description": "Begin"},
+        {"step_number": 2, "step_name": "End", "step_description": "Finish"}
+      ],
+      "recommended_tool": "Notion",
+      "reason_for_recommendation": "Simple workflow"
+    }
+  },
+  "expected": {
+    "flowchart_nodes_count": 2
+  }
+}
+ 

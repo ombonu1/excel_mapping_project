@@ -1,0 +1,27 @@
+{
+ "name": "ms_automation_full_pipeline",
+ "mode": "pipeline",
+ "input": {
+   "excel_inputs": {
+     "excel_file_metadata": {
+       "contains_sharepoint_links": true,
+       "contains_google_links": false
+     },
+     "extracted_steps": [
+       {"step_number": 1, "step_name": "Load Data", "step_description": "Load all Excel sheets."},
+       {"step_number": 2, "step_name": "Clean", "step_description": "Apply basic cleaning."},
+       {"step_number": 3, "step_name": "Approval", "step_description": "Manager approves final dataset."}
+     ],
+     "process_features": {
+       "requires_automation": true,
+       "requires_approval_flow": true,
+       "task_volume": "high",
+       "data_shape": "tabular"
+     }
+   },
+   "user_feedback_sequence": ["happy"]
+ },
+ "expected": {
+   "recommended_tool": "Power Automate"
+ }
+}

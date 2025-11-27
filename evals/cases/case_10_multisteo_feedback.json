@@ -1,0 +1,31 @@
+{
+  "name": "full_pipeline_multistep_feedback",
+  "mode": "pipeline",
+  "input": {
+    "excel_inputs": {
+      "excel_file_metadata": {
+        "contains_sharepoint_links": true
+      },
+      "extracted_steps": [
+        {"step_number": 1, "step_name": "Import", "step_description": "Import data"},
+        {"step_number": 2, "step_name": "Check", "step_description": "Check entries"},
+        {"step_number": 3, "step_name": "Approve", "step_description": "Approve items"}
+      ],
+      "process_features": {
+        "requires_automation": true,
+        "requires_approval_flow": true,
+        "task_volume": "medium"
+      }
+    },
+    "user_feedback_sequence": [
+      "expand step 1",
+      "make step 2 clearer",
+      "pick a better tool",
+      "happy"
+    ]
+  },
+  "expected": {
+    "final_output_exists": true
+  }
+}
+ 
