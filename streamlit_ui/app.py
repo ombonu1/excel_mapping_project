@@ -4,8 +4,8 @@ import os
 from typing import List, Any
 import streamlit as st
 
-from understanding_agent import run_understanding_agent
-from mapping_agent import run_mapping_agent
+from excel_understanding_agent.agent import run_understanding_agent
+from process_mapping_agent.sub_agents import run_mapping_agent
 from product_selector_agent import run_product_selector_agent
 from feedback_agent import run_feedback_agent
 from final_output_agent import run_final_output_agent
