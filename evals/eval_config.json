@@ -1,0 +1,23 @@
+{
+  "agents": {
+    "excel_understanding": "agents/excel_understanding_agent.py",
+    "mapping": "agents/mapping_agent.py",
+    "product_selector": "agents/product_selector_agent.py",
+    "feedback": "agents/feedback_agent.py",
+    "final_output": "agents/final_output_agent.py"
+  },
+  "tools": {
+    "diagram_tool": "tools/generate_process_diagram_tool.py"
+  },
+  "paths": {
+    "eval_cases_root": "evals/cases",
+    "logs_root": "evals/logs"
+  },
+  "settings": {
+    "strict_schema": true,
+    "compare_recommended_tool_exact": true,
+    "allow_reason_flexibility": true,
+    "max_FEEDBACK_ITERATIONS": 5
+  }
+}
+ 

@@ -1,0 +1,22 @@
+{
+ "name": "feedback_change_tool_valid",
+ "mode": "single",
+ "agent": "feedback_agent",
+ "input": {
+   "initial_output": {
+     "process_map": [
+       {"step_number": 1, "step_name": "Start", "step_description": "Begin process."}
+     ],
+     "recommended_tool": "Notion",
+     "reason_for_recommendation": "Basic documentation"
+   },
+   "product_selector_output": {
+     "top_5_tools": ["Notion", "AppSheet", "Airtable"]
+   },
+   "png_path": "p1.png",
+   "user_feedback": "Switch to AppSheet please"
+ },
+ "expected": {
+   "updated_recommended_tool": "AppSheet"
+ }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "product_selector_missing_fields",
+  "mode": "single",
+  "agent": "product_selector_agent",
+  "input": {
+    "process_map": [],
+    "excel_analysis": {},
+    "environment_context": {}
+  },
+  "expected": {
+    "recommended_tool": null
+  }
+}
+ 
