@@ -1,0 +1,26 @@
+{
+ "name": "feedback_expand_step",
+ "agent": "feedback_agent",
+ "mode": "loop",
+ "input": {
+   "initial_output": {
+     "process_map": [
+       {"step_number": 1, "step_name": "Collect Data", "step_description": "Collect raw input."},
+       {"step_number": 2, "step_name": "Upload", "step_description": "Upload to system."}
+     ],
+     "recommended_tool": "Notion",
+     "reason_for_recommendation": "Simple documentation"
+   },
+   "product_selector_output": {
+     "top_5_tools": ["Notion", "AppSheet", "Power Automate", "Airtable", "JIRA"]
+   },
+   "png_path": "initial.png"
+ },
+ "user_feedback_sequence": [
+   "Please expand step 1",
+   "happy"
+ ],
+ "expected": {
+   "user_satisfied": true
+ }
+}

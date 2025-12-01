@@ -1,0 +1,28 @@
+{
+  "name": "google_tabular_pipeline",
+  "mode": "pipeline",
+  "input": {
+    "excel_inputs": {
+      "excel_file_metadata": {
+        "contains_sharepoint_links": false,
+        "contains_google_links": true
+      },
+      "extracted_steps": [
+        {"step_number": 1, "step_name": "Import", "step_description": "Import Google Sheet extract."},
+        {"step_number": 2, "step_name": "Validate", "step_description": "Check missing values."},
+        {"step_number": 3, "step_name": "Notify", "step_description": "Send update notification."}
+      ],
+      "process_features": {
+        "requires_automation": true,
+        "requires_approval_flow": false,
+        "task_volume": "high",
+        "data_shape": "tabular"
+      }
+    },
+    "user_feedback_sequence": ["happy"]
+  },
+  "expected": {
+    "recommended_tool": "AppSheet"
+  }
+}
+ 

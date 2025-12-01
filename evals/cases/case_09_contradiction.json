@@ -1,0 +1,20 @@
+{
+ "name": "product_selector_contradiction_case",
+ "mode": "single",
+ "agent": "product_selector_agent",
+ "input": {
+   "process_map": [
+     {"step_number": 1, "step_name": "Review", "step_description": "Check content."}
+   ],
+   "extracted_features": {
+     "process_type": "approval_flow",
+     "requires_approval_flow": false
+   },
+   "environment_context": {
+     "inferred_preferred_stack": "Microsoft"
+   }
+ },
+ "expected": {
+   "recommended_tool": "Power Automate"
+ }
+}
