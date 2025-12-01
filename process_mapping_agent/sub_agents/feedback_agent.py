@@ -1,7 +1,7 @@
 from google.adk import Agent
 from config import DEFAULT_MODEL
-from schemas.feedback_schema import FeedbackSchema
-from tools.generate_process_diagram_tool import generate_process_diagram_tool
+from process_mapping_agent.schemas.feedback_schema import FeedbackSchema
+from process_mapping_agent.tools.generate_process_diagram_tool import generate_process_diagram_tool
 
 
 feedback_agent = Agent(

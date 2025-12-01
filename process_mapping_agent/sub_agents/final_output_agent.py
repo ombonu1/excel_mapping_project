@@ -1,6 +1,6 @@
 from google.adk import Agent
 from config import DEFAULT_MODEL
-from schemas.final_output_schema import FinalOutputSchema
+from process_mapping_agent.schemas.final_output_schema import FinalOutputSchema
 final_output_agent = Agent(
     name="final_output_agent",
     model=DEFAULT_MODEL,

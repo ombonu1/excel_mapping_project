@@ -3,12 +3,14 @@
 import os
 from typing import List, Any
 import streamlit as st
+from agent_runner import (
+    run_understanding_agent,
+    run_mapping_agent,
+    run_product_selector_agent,
+    run_feedback_agent,
+    run_final_output_agent
+)
 
-from excel_understanding_agent.agent import run_understanding_agent
-from process_mapping_agent.sub_agents import run_mapping_agent
-from product_selector_agent import run_product_selector_agent
-from feedback_agent import run_feedback_agent
-from final_output_agent import run_final_output_agent
 
 # STREAMLIT CONFIG & INTRO
 # ------------------------------------------------------------------
@@ -91,6 +93,7 @@ if run_button:
 # ------------------------------
     with st.spinner("Running Understanding Agent (Gemini)…"):
         understanding_json = run_understanding_agent(uploaded_files)
+        print("UNDERSTANDING JSON:", understanding_json)
 
     st.session_state["understanding_json"] = understanding_json
 
@@ -128,7 +131,7 @@ if "map_result" in st.session_state or "product_result" in st.session_state:
     st.markdown("---")
     st.subheader("Step 3 – Mapping Agent & Product Selector Agent")
 
-    col_map, col_prod = st.columns(2)
+col_map, col_prod = st.columns(2)
 
 # 3a – Mapping Agent output
 with col_map:

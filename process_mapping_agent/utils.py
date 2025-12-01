@@ -10,6 +10,13 @@ def generate_process_map(process_data: dict) -> str:
     dot = Digraph(comment="Process Flow", format="png")
     dot.attr(rankdir="LR", size="8,5")
 
+     # The agent is passing a *string*, not a dict → fix it gracefully
+    if isinstance(process_data, str):
+       try:
+           process_data = json.loads(process_data)
+       except Exception:
+           raise ValueError("generate_process_map: received a string but failed to decode JSON")
+
     for wb_id, wb in process_data.get("workbooks", {}).items():
         with dot.subgraph(name=f"cluster_{wb_id}") as wb_cluster:   # type:ignore
             wb_cluster.attr(label=wb.get("name", wb_id), style="dashed")

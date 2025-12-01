@@ -1,6 +1,6 @@
 from google.adk import Agent
 from config import DEFAULT_MODEL
-from schemas.product_selector_schema import ProductSelectorSchema
+from process_mapping_agent.schemas.product_selector_schema import ProductSelectorSchema
 
 product_selector_agent = Agent(
     name="product_selector_agent",

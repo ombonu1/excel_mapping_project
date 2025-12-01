@@ -3,8 +3,8 @@ import asyncio
 from pathlib import Path
 from asserts import *
 from pipeline_test_utils import full_pipeline, run_agent
-from sub_agents.excel_understanding_agent import excel_understanding_agent
-from agents.mapping_agent import mapping_agent
+from excel_understanding_agent.agent import excel_understanding_agent
+from process_mapping_agent.mapping_agent import process_visualization_agent as mapping_agent
 from process_mapping_agent.sub_agents.product_selector_agent import product_selector_agent
 from process_mapping_agent.sub_agents.feedback_agent import feedback_agent
 from process_mapping_agent.sub_agents.final_output_agent import final_output_agent
