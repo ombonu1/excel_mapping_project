@@ -7,6 +7,8 @@ import datetime
 from docx import Document
 from docx.shared import Inches
 from io import BytesIO
+import nest_asyncio
+nest_asyncio.apply()  # <--- The Magic Line. Fixes the loop issues.
 from agent_runner import (
     run_understanding_agent,
     run_mapping_agent,
@@ -36,8 +38,13 @@ MOCK_PRODUCT_RESULT = {
 # --- STREAMLIT CONFIG ---
 st.set_page_config(page_title="Excel Process Mapping", layout="wide")
 
+
+
 if "saved_reports" not in st.session_state:
     st.session_state["saved_reports"] = []  # List of {timestamp, content, png_bytes, title}
+
+if "is_dev" not in st.session_state:
+    st.session_state["is_dev"] = False
 
 # --- HELPER FUNCTIONS ---
 
@@ -254,6 +261,15 @@ def view_saved_report(report):
         docx = _generate_docx(report["content"], image_bytes=report["png_bytes"])
         st.download_button("📥 Download Word Doc", docx, file_name=f"{report['title']}.docx", mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
+@st.dialog("🔐 Developer Login")
+def show_dev_login():
+    password = st.text_input("Enter Access Key", type="password")
+    if st.button("Unlock"):
+        if password == "2026admin123":
+            st.session_state["is_dev"] = True
+            st.rerun()
+        else:
+            st.error("Incorrect password.")
 # --- MAIN UI ---
 # --- SIDEBAR & CONFIG ---
 with st.sidebar:
@@ -263,14 +279,6 @@ with st.sidebar:
     st.markdown("3️⃣ Review & Feedback")
     st.markdown("4️⃣ Final Output")
     
-    st.markdown("---")
-    st.header("🛠️ Debug Settings")
-    st.caption("Toggle to use MOCK data (save API quota).")
-    
-    use_mock_understanding = st.checkbox("Mock Step 2 (Understanding)", value=True)
-    use_mock_mapping = st.checkbox("Mock Step 3a (Mapping)", value=False)
-    use_mock_product = st.checkbox("Mock Step 3b (Product Selector)", value=False)
-
     st.header("🗂️ Saved Reports")
     if not st.session_state["saved_reports"]:
         st.caption("No reports saved yet.")
@@ -279,6 +287,34 @@ with st.sidebar:
             # Use a button to trigger the dialog
             if st.button(f"📄 {rep['title']}", key=f"btn_{rep['id']}"):
                 view_saved_report(rep)
+
+    st.markdown("---")
+    # --- CONDITIONAL DEBUG SECTION ---
+    if st.session_state["is_dev"]:
+        
+        
+        st.subheader("🛠️ Debug Settings")
+        use_mock_understanding = st.checkbox("Mock Step 2 (Understanding)", value=True)
+        use_mock_mapping = st.checkbox("Mock Step 3a (Mapping)", value=False)
+        use_mock_product = st.checkbox("Mock Step 3b (Product Selector)", value=False)
+        
+        st.success("👨‍💻 Developer Mode Active")
+
+        if st.button("Logout"):
+            st.session_state["is_dev"] = False
+            st.rerun()
+            
+    else:
+        # Defaults for normal users (Must be False so the real agents run!)
+        use_mock_understanding = False
+        use_mock_mapping = False
+        use_mock_product = False
+        
+        # The "Secret Door" Button
+        if st.button("🔒 Developer Access", type="tertiary"):
+            show_dev_login()
+
+    
 
 st.markdown("""
 **Step 1.** Upload Excel files.
@@ -422,11 +458,31 @@ if "understanding_json" in st.session_state and "map_result" in st.session_state
     
     # 1. Display Change Log
     if "feedback_log" in st.session_state:
-        with st.expander("📝 Latest Changes Applied", expanded=True):
-            log = st.session_state["feedback_log"]
-            st.success(f"Changes: {log.get('changes_made', 'N/A')}")
-            if log.get("reason_for_update"):
-                st.info(f"Reason: {log.get('reason_for_update')}")
+        # 1. Display Change History (All Changes)
+        if "feedback_history" in st.session_state and st.session_state["feedback_history"]:
+            with st.expander(f"📝 Change Log ({len(st.session_state['feedback_history'])} updates)", expanded=True):
+                
+                # Iterate through the list in reverse order (newest first)
+                for i, log in enumerate(reversed(st.session_state["feedback_history"]), 1):
+                    
+                    # Create a mini header for each change
+                    st.markdown(f"**Update #{len(st.session_state['feedback_history']) - i + 1}**")
+                    
+                    # Show the change details
+                    st.info(f"Changed: {log.get('changes_made', 'N/A')}")
+                    
+                    # Optional: Show reason if it exists
+                    if log.get("reason_for_update"):
+                        st.caption(f"Reason: {log.get('reason_for_update')}")
+                    
+                    # Add a divider between entries (except the last one)
+                    if i < len(st.session_state["feedback_history"]):
+                        st.divider()
+                        
+        elif "feedback_log" in st.session_state:
+            # Fallback if history is empty but log exists (rare legacy case)
+            with st.expander("📝 Latest Changes Applied", expanded=True):
+                st.success(f"Changes: {st.session_state['feedback_log'].get('changes_made')}")
 
     if "feedback_history" not in st.session_state:
         st.session_state["feedback_history"] = []

@@ -7,7 +7,8 @@ from google.adk.tools import ToolContext
 import re
 from google.adk.events import Event, EventActions
 import time
-from google.api_core.exceptions import ServiceUnavailable, DeadlineExceeded, InternalServerError
+from google.api_core.exceptions import ServiceUnavailable, DeadlineExceeded, InternalServerError 
+import traceback
 
 # Import your agents
 from process_mapping_agent.excel_understanding_agent import excel_understanding_agent
@@ -67,11 +68,7 @@ def json_safe(obj):
 
 def run_with_retry(func, *args, retries=3, delay=2, **kwargs):
     """
-    Executes a function with automatic retries for known 'flaky' errors.
-    Catches:
-    1. ValueError (Agent forgot to speak/output text)
-    2. RuntimeError ('Event loop is closed')
-    3. Google API transient errors (503 Service Unavailable, Timeouts)
+    Robust execution wrapper. Retries on ANY crash.
     """
     last_exception = None
     
@@ -79,30 +76,27 @@ def run_with_retry(func, *args, retries=3, delay=2, **kwargs):
         try:
             return func(*args, **kwargs)
             
-        except ValueError as e:
-            # Case A: Agent ran tool but returned no final text
-            print(f"⚠️ [Attempt {attempt+1}] Agent output missing text. Retrying...")
-            last_exception = e
+        except Exception as e:
+            # We now catch EVERYTHING (Exception), not just specific ones.
+            # This ensures 'AttributeError', 'RuntimeError', etc. are all retried.
             
-        except RuntimeError as e:
-            # Case B: The dreaded 'Event loop is closed'
-            if "Event loop is closed" in str(e):
-                print(f"⚠️ [Attempt {attempt+1}] AsyncIO Event Loop closed. Retrying with fresh loop...")
-                last_exception = e
-            else:
-                # If it's a real runtime error (like logical crash), raise it.
+            error_name = type(e).__name__
+            print(f"⚠️ [Attempt {attempt+1}/{retries}] Hit error: {error_name} - {e}")
+            
+            # Specific check: If it's a fatal Auth error, don't retry (waste of time)
+            if "PermissionDenied" in str(e) or "Unauthenticated" in str(e):
                 raise e
-
-        except (ServiceUnavailable, DeadlineExceeded, InternalServerError) as e:
-            # Case C: Google API just hiccuped
-            print(f"⚠️ [Attempt {attempt+1}] Google API glitch ({type(e).__name__}). Retrying...")
+            
             last_exception = e
             
-        # Wait before retrying (Exponential backoff is nicer: 2s, 4s, 8s)
-        time.sleep(delay * (attempt + 1))
+            # Exponential backoff: Wait 2s, then 4s, then 6s
+            sleep_time = delay * (attempt + 1)
+            time.sleep(sleep_time)
 
-    # If we get here, we failed 3 times in a row.
+    # If we get here, it's a persistent failure.
     print(f"❌ All {retries} retries failed.")
+    print("Traceback of last error:")
+    traceback.print_exc() # Print full details to console for debugging
     raise last_exception
 # ----------------------------------------------------------------------------
 # Helper: create a Runner for each agent

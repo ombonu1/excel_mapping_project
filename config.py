@@ -2,7 +2,7 @@ import os
 from google import genai
 
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
 if GOOGLE_API_KEY is None:
     raise ValueError("Can't find the API Key LOL")
