@@ -1,34 +1,65 @@
 from graphviz import Digraph
 import os
+from typing import List, Dict, Any
 
-def generate_process_diagram_tool(process_data: dict) -> str:
+# NOTE: We use 'list' in the signature to satisfy the API Schema requirements.
+# The internal code still handles Dicts safely.
+def generate_process_diagram_tool(process_data: List[Dict[str, Any]]) -> str:
     """
-    Converts process dictionary into a Graphviz diagram and saves as PNG.
+    Generates a Graphviz PNG from the process_map list.
     Returns the absolute file path.
     """
+    # 1. Normalize Data
+    steps = []
+    
+    # Even though type hint says list, Python allows Dicts to pass at runtime.
+    if isinstance(process_data, dict):
+        steps = process_data.get("process_map", [])
+        if not steps and "workbooks" in process_data:
+             return "Error: Received old 'workbooks' format. Expected 'process_map' list."
+             
+    elif isinstance(process_data, list):
+        steps = process_data
+    
+    if not steps:
+        return "Error: No process steps found to visualize."
+
+    # 2. Initialize Graphviz
     dot = Digraph(comment="Process Flow", format="png")
-    dot.attr(rankdir="LR", size="8,5")
+    dot.attr(rankdir="TB") 
+    dot.attr('node', shape='box', style='filled', fillcolor='lightblue')
 
-    for wb_id, wb in process_data.get("workbooks", {}).items():
-        with dot.subgraph(name=f"cluster_{wb_id}") as wb_cluster:
-            wb_cluster.attr(label=wb.get("name", wb_id), style="dashed")
-            for sheet_id, sheet in wb.get("sheets", {}).items():
-                with wb_cluster.subgraph(name=f"cluster_{wb_id}_{sheet_id}") as sheet_cluster:
-                    sheet_cluster.attr(label=sheet.get("name", sheet_id), style="rounded")
-                    for proc_id, proc in sheet.get("processes", {}).items():
-                        for step_id, step in proc.get("steps", {}).items():
-                            node_id = f"{wb_id}.{sheet_id}.{proc_id}.{step_id}"
-                            label = step.get("name", step_id)
-                            shape = step.get("visualization", {}).get("shape", "box")
-                            color = step.get("visualization", {}).get("color", "lightblue")
-                            sheet_cluster.node(node_id, label, shape=shape, style="filled", fillcolor=color)
+    # 3. Create Nodes
+    for i, step in enumerate(steps):
+        # Handle cases where step might be a string (rare but possible)
+        if isinstance(step, str):
+            step_name = step
+            role = "Unknown"
+            is_decision = False
+        else:
+            step_name = step.get("step_name", f"Step {i+1}")
+            role = step.get("role", "Unknown Role")
+            is_decision = step.get("decision_point", False)
+        
+        # Styling
+        if is_decision:
+            shape = "diamond"
+            color = "orange"
+        else:
+            shape = "box"
+            color = "lightblue"
+            
+        label = f"<{step_name}<BR/><FONT POINT-SIZE='10' COLOR='gray'>{role}</FONT>>"
+        dot.node(str(i), label=label, shape=shape, fillcolor=color)
 
-                            for next_step in step.get("dependencies", {}).get("next_steps", []):
-                                dot.edge(node_id, next_step)
+    # 4. Create Edges
+    for i in range(len(steps) - 1):
+        dot.edge(str(i), str(i+1))
 
-    output_path = "process_map.png"
+    # 5. Render
+    output_path = "process_map"
     try:
-        dot.render(output_path, cleanup=True)
-        return os.path.abspath(output_path)
+        full_path = dot.render(output_path, cleanup=True)
+        return full_path
     except Exception as e:
-        return e
+        return f"Error rendering Graphviz: {str(e)}"
