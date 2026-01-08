@@ -1,8 +1,10 @@
 streamlit
 google-genai
 google-cloud-aiplatform
-python-docx
+google-adk
+pandas
+openpyxl
 graphviz
+python-docx
 pydantic
 nest_asyncio
-google-adk
